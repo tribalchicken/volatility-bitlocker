@@ -13,9 +13,9 @@ class Bitlocker(common.AbstractWindowsCommand):
         common.AbstractWindowsCommand.__init__(self, config, *args, **kwargs)
     def calculate(self):
         PoolSize = {
-        'Fvec128' : 527,
+        'Fvec128' : 508,
         'Fvec256' : 1008,
-        'Cngb128' : 672,
+        'Cngb128' : 644,
         'Cngb256' : 672,
         }
         BLMode = {
