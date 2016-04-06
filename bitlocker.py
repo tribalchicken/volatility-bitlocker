@@ -15,8 +15,8 @@ class Bitlocker(common.AbstractWindowsCommand):
         PoolSize = {
         'Fvec128' : 508,
         'Fvec256' : 1008,
-        'Cngb128' : 672,
-        'Cngb256' : 688,
+        'Cngb128' : 632,
+        'Cngb256' : 672,
         }
         BLMode = {
         '00' : 'AES 128-bit with Diffuser',
@@ -25,12 +25,15 @@ class Bitlocker(common.AbstractWindowsCommand):
         '03' : 'AES 256-bit',
         '10' : 'AES 128-bit (Win 8+)',
         '20' : 'AES 256-bit (Win 8+)'
-     }
+       }
 
         length = 16
 
         address_space = utils.load_as(self._config)
         winver = (address_space.profile.metadata.get("major", 0), address_space.profile.metadata.get("minor", 0))
+        arch = address_space.profile.metadata.get("memory_model",0)
+
+
         if winver < (6,2):
             poolsize = lambda x : x >= PoolSize['Fvec128'] and x <= PoolSize['Fvec256']
 
@@ -41,18 +44,29 @@ class Bitlocker(common.AbstractWindowsCommand):
                 ('CheckPoolSize', dict(condition = poolsize)),
                 ('CheckPoolType', dict(paged = False, non_paged = True)),
                      ]
+            # Only temporary until this can be fixed properly
+            if (arch == '32bit'):
+                modeOffsetRel = 0x18
+                fvekOffsetRel = 0x20
+                tweakOffsetRel = 0x1F8
+
+            if (arch == '64bit'):
+                modeOffsetRel = 0x2C
+                fvekOffsetRel = 0x30
+                tweakOffsetRel = 0x210
+
             for offset in scanner.scan(address_space):
                 pool = obj.Object("_POOL_HEADER", offset = offset, vm = address_space)
-                mode = address_space.zread(offset+0x2C,1)
+                mode = address_space.zread(offset+modeOffsetRel,1)
 	        for o, h, c in utils.Hexdump(mode):
                     mode =h
 
                 if mode == '01' or mode == '03':
                     length = 32
-                fvek_raw = address_space.zread(offset+0x30,length)
+                fvek_raw = address_space.zread(offset+fvekOffsetRel,length)
                 tweak = []
                 if mode == '01' or mode == '00':
-                    for o, h ,c in utils.Hexdump(address_space.zread(offset+0x210,length)):
+                    for o, h ,c in utils.Hexdump(address_space.zread(offset+tweakOffsetRel,length)):
                         tweak.append(h)
                 yield pool, BLMode[mode], tweak, fvek_raw
         if winver >= (6,2):
@@ -64,16 +78,27 @@ class Bitlocker(common.AbstractWindowsCommand):
                 ('CheckPoolSize', dict(condition = poolsize)),
                 ('CheckPoolType', dict(paged = False, non_paged = True)),
                      ]
+
+            if (arch == '32bit'):
+                modeOffsetRel = 0x5C
+                fvek1OffsetRel = 0x60
+                fvek2OffsetRel = 0x84
+
+            if (arch == '64bit'):
+                modeOffsetRel = 0x68
+                fvek1OffsetRel = 0x6C
+                fvek2OffsetRel = 0x90
+
             for offset in scanner.scan(address_space):
                 pool = obj.Object("_POOL_HEADER", offset = offset, vm = address_space)
-                mode = address_space.zread(offset+0x68,1)
+                mode = address_space.zread(offset+modeOffsetRel,1)
                 for o, h, c in utils.Hexdump(mode):
                     mode =h
 
                 if mode == '20':
                     length = 32
-                f1 = address_space.zread(offset+0x6C,length)
-                f2 = address_space.zread(offset+0x90,length)
+                f1 = address_space.zread(offset+fvek1OffsetRel,length)
+                f2 = address_space.zread(offset+fvek2OffsetRel,length)
                 if f1 == f2:
                     yield pool, BLMode[mode], tweak, f2
 
