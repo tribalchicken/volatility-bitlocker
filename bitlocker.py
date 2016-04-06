@@ -15,8 +15,8 @@ class Bitlocker(common.AbstractWindowsCommand):
         PoolSize = {
         'Fvec128' : 508,
         'Fvec256' : 1008,
-        'Cngb128' : 644,
-        'Cngb256' : 672,
+        'Cngb128' : 672,
+        'Cngb256' : 688,
         }
         BLMode = {
         '00' : 'AES 128-bit with Diffuser',
