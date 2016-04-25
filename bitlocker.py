@@ -63,6 +63,8 @@ class Bitlocker(common.AbstractWindowsCommand):
 
                 if mode == '01' or mode == '03':
                     length = 32
+                else:
+                    length = 16
                 fvek_raw = address_space.zread(offset+fvekOffsetRel,length)
                 tweak = []
                 if mode == '01' or mode == '00':
@@ -97,6 +99,8 @@ class Bitlocker(common.AbstractWindowsCommand):
 
                 if mode == '20':
                     length = 32
+                else:
+                    length = 16                 
                 f1 = address_space.zread(offset+fvek1OffsetRel,length)
                 f2 = address_space.zread(offset+fvek2OffsetRel,length)
                 if f1 == f2:
