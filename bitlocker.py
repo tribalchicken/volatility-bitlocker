@@ -81,6 +81,7 @@ class Bitlocker(common.AbstractWindowsCommand):
                 ('CheckPoolType', dict(paged = False, non_paged = True)),
                      ]
 
+		# Quick, hacky fix as a temporary solution.
             if (arch == '32bit'):
                 modeOffsetRel = 0x5C
                 fvek1OffsetRel = 0x60
