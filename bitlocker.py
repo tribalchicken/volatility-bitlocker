@@ -82,6 +82,7 @@ class Bitlocker(common.AbstractWindowsCommand):
                      ]
 
 		# Quick, hacky fix as a temporary solution.
+		# https://pbs.twimg.com/media/Ce-B2sgXEAAqTQ_.jpg
             if (arch == '32bit'):
                 modeOffsetRel = 0x5C
                 fvek1OffsetRel = 0x60
