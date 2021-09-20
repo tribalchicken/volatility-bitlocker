@@ -10,7 +10,7 @@ Finds the FVEK on Windows 7 by searching for the FVEc pool tag.
 
 Attempts to locate the FVEK on Windows 8, 8.1 and 10 by analysing memory after finding the Cngb pool tag.
 
-Article here: https://tribalchicken.com.au/technical/recovering-bitlocker-keys-on-windows-8-1-and-10/
+Article here: https://tribalchicken.net/recovering-bitlocker-keys-on-windows-8-1-and-10/
 
 ## Usage
 bitlocker.py is a plugin for the Volatility Framework. You can either place the plugin in the plugins directory at `volatility/plugins`, or  alternatively, you can place the plugin in a separate directory and point volatility to it with `--plugins`
